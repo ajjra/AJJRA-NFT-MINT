@@ -1,0 +1,169 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+interface IERC20 {
+    function transferFrom(
+        address from,
+        address to,
+        uint256 amount
+    ) external returns (bool);
+
+    function decimals()
+        external
+        view
+        returns (uint8);
+}
+
+contract AJJRANFTMint {
+
+    string public constant name = "AJJRA NFT";
+    string public constant symbol = "AJJRA";
+
+    // MST Mainnet Bridged USDC.e
+    IERC20 public immutable USDC;
+
+    // AJJRA service-fee wallet
+    address public immutable feeWallet =
+        0x58A355040D211e0dB4140E98eE6619207f43e934;
+
+    // 1 USDC.e = 1,000,000 units
+    uint256 public constant SERVICE_FEE =
+        1000000;
+
+    uint256 public nextTokenId = 1;
+
+    struct NFTData {
+        uint256 tokenId;
+        address owner;
+        string nftName;
+        string description;
+        string metadataURI;
+        uint256 createdAt;
+    }
+
+    mapping(uint256 => NFTData) public nfts;
+
+    mapping(address => uint256[]) private myNFTs;
+
+    event ServiceFeePaid(
+        address indexed customer,
+        address indexed receiver,
+        uint256 amount
+    );
+
+    event NFTMinted(
+        uint256 indexed tokenId,
+        address indexed owner,
+        string nftName,
+        string metadataURI
+    );
+
+    constructor(address _usdc) {
+
+        require(
+            _usdc != address(0),
+            "Invalid USDC address"
+        );
+
+        USDC = IERC20(_usdc);
+    }
+
+    function mintNFT(
+        string calldata _nftName,
+        string calldata _description,
+        string calldata _metadataURI
+    )
+        external
+        returns (uint256)
+    {
+
+        require(
+            bytes(_nftName).length > 0,
+            "NFT name required"
+        );
+
+        // Customer must approve 1 USDC.e first
+        bool paid = USDC.transferFrom(
+            msg.sender,
+            feeWallet,
+            SERVICE_FEE
+        );
+
+        require(
+            paid,
+            "USDC payment failed"
+        );
+
+        uint256 tokenId = nextTokenId;
+
+        nextTokenId++;
+
+        nfts[tokenId] = NFTData({
+            tokenId: tokenId,
+            owner: msg.sender,
+            nftName: _nftName,
+            description: _description,
+            metadataURI: _metadataURI,
+            createdAt: block.timestamp
+        });
+
+        myNFTs[msg.sender].push(tokenId);
+
+        emit ServiceFeePaid(
+            msg.sender,
+            feeWallet,
+            SERVICE_FEE
+        );
+
+        emit NFTMinted(
+            tokenId,
+            msg.sender,
+            _nftName,
+            _metadataURI
+        );
+
+        return tokenId;
+    }
+
+    function getNFT(
+        uint256 tokenId
+    )
+        external
+        view
+        returns (
+            uint256,
+            address,
+            string memory,
+            string memory,
+            string memory,
+            uint256
+        )
+    {
+
+        require(
+            nfts[tokenId].owner != address(0),
+            "NFT not found"
+        );
+
+        NFTData memory n = nfts[tokenId];
+
+        return (
+            n.tokenId,
+            n.owner,
+            n.nftName,
+            n.description,
+            n.metadataURI,
+            n.createdAt
+        );
+    }
+
+    function getMyNFTs()
+        external
+        view
+        returns (
+            uint256[] memory
+        )
+    {
+        return myNFTs[msg.sender];
+    }
+}
