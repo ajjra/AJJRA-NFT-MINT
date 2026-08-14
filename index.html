@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>AJJRA NFT</title>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+min-height:100vh;
+background:
+radial-gradient(circle at top,#4933a3 0,#120c2d 38%,#050507 75%);
+color:#fff;
+padding:18px
+}
+
+.app{
+max-width:480px;
+margin:auto
+}
+
+.header{
+text-align:center;
+padding:25px 0
+}
+
+.header h1{
+font-size:40px;
+letter-spacing:4px;
+margin:0
+}
+
+.header p{
+color:#aaa
+}
+
+.card{
+background:rgba(255,255,255,.08);
+border:1px solid rgba(255,255,255,.14);
+border-radius:26px;
+padding:22px;
+backdrop-filter:blur(18px);
+box-shadow:0 25px 60px #0008
+}
+
+.network{
+display:flex;
+justify-content:space-between;
+padding:13px;
+border-radius:13px;
+background:#0005;
+font-size:13px
+}
+
+button{
+width:100%;
+border:0;
+border-radius:14px;
+padding:16px;
+margin-top:14px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer
+}
+
+.connect{
+background:linear-gradient(135deg,#7657ff,#bd45ff);
+color:white
+}
+
+.mint{
+background:linear-gradient(135deg,#00c6ff,#0066ff);
+color:white
+}
+
+.mint:disabled{
+opacity:.4;
+cursor:not-allowed
+}
+
+.wallet{
+margin-top:12px;
+padding:12px;
+background:#0005;
+border-radius:12px;
+font-size:12px;
+word-break:break-all;
+color:#bbb
+}
+
+.upload{
+margin-top:18px;
+padding:20px;
+border:2px dashed #ffffff30;
+border-radius:18px;
+text-align:center
+}
+
+input,textarea{
+width:100%;
+padding:14px;
+margin-top:12px;
+border-radius:12px;
+border:1px solid #ffffff25;
+background:#080808;
+color:white;
+font-size:15px;
+outline:none
+}
+
+textarea{
+height:100px;
+resize:none
+}
+
+.preview{
+width:100%;
+max-height:280px;
+object-fit:cover;
+border-radius:15px;
+margin-top:15px;
+display:none
+}
+
+.fee{
+text-align:center;
+font-size:20px;
+margin:20px 0
+}
+
+.status{
+margin-top:15px;
+padding:14px;
+border-radius:13px;
+background:#ffffff08;
+font-size:13px;
+line-height:1.6;
+word-break:break-word
+}
+
+.status a{
+color:#55c7ff
+}
+
+.small{
+font-size:11px;
+color:#777;
+text-align:center;
+margin-top:18px
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="header">
+<h1>AJJRA</h1>
+<p>NFT Marketplace • MST Blockchain</p>
+</div>
+
+<div class="card">
+
+<div class="network">
+<span>🟢 MST Mainnet</span>
+<span>Chain 4646</span>
+</div>
+
+<button
+class="connect"
+id="connectBtn"
+onclick="connectWallet()">
+🔗 Connect Wallet
+</button>
+
+<div
+class="wallet"
+id="wallet">
+Wallet not connected
+</div>
+
+<div class="fee">
+Mint Fee<br>
+<b>1 USDC.e</b>
+</div>
+
+<div class="upload">
+
+<label>
+📷 Select NFT Image
+
+<input
+type="file"
+id="image"
+accept="image/*"
+onchange="previewImage()">
+
+</label>
+
+<img
+id="preview"
+class="preview">
+
+</div>
+
+<input
+id="name"
+type="text"
+placeholder="NFT Name">
+
+<textarea
+id="description"
+placeholder="NFT Description"></textarea>
+
+<button
+class="mint"
+id="mintBtn"
+onclick="mintNFT()"
+disabled>
+🚀 Mint NFT
+</button>
+
+<div
+class="status"
+id="status">
+Connect wallet to begin.
+</div>
+
+</div>
+
+<div class="small">
+AJJRA TECHNO HUB
+</div>
+
+</div>
+
+<script>
+
+/* ============================
+   MST MAINNET
+============================ */
+
+const MST = {
+
+chainId:"0x1226",
+
+chainName:"MST Mainnet",
+
+nativeCurrency:{
+name:"MSTC",
+symbol:"MSTC",
+decimals:18
+},
+
+rpcUrls:[
+"https://mariorpc.mstblockchain.com"
+],
+
+blockExplorerUrls:[
+"https://mstscan.com"
+]
+
+};
+
+
+/* ============================
+   USDC.e
+============================ */
+
+const USDC =
+"0x349d9836dd52c25e61Ae745e3da0F8989De63745";
+
+
+/* ============================
+   YOUR FEE WALLET
+============================ */
+
+const FEE_WALLET =
+"0x58A355040D211e0dB4140E98eE6619207f43e934";
+
+
+/* ============================
+   NFT CONTRACT
+
+   MUST BE DEPLOYED FIRST
+============================ */
+
+const NFT_CONTRACT =
+"0xYOUR_NFT_CONTRACT_ADDRESS";
+
+
+let provider=null;
+let signer=null;
+let account=null;
+
+
+/* ============================
+   STATUS
+============================ */
+
+function setStatus(text){
+
+document.getElementById(
+"status"
+).innerHTML=text;
+
+}
+
+
+/* ============================
+   CONNECT
+============================ */
+
+async function connectWallet(){
+
+if(!window.ethereum){
+
+setStatus(
+"❌ Wallet provider not detected.<br><br>"+
+"Chrome normal browser-ൽ MetaMask provider ഇല്ലെങ്കിൽ "+
+"MetaMask Mobile Browser ഉപയോഗിക്കുക."
+);
+
+return;
+
+}
+
+try{
+
+setStatus("⏳ Connecting wallet...");
+
+
+await window.ethereum.request({
+
+method:"eth_requestAccounts"
+
+});
+
+
+try{
+
+await window.ethereum.request({
+
+method:"wallet_switchEthereumChain",
+
+params:[
+{
+chainId:MST.chainId
+}
+]
+
+});
+
+}
+
+catch(error){
+
+if(error.code===4902){
+
+await window.ethereum.request({
+
+method:"wallet_addEthereumChain",
+
+params:[MST
+
+]
+
+});
+
+}else{
+
+throw error;
+
+}
+
+}
+
+
+provider =
+new ethers.BrowserProvider(
+window.ethereum
+);
+
+
+signer =
+await provider.getSigner();
+
+
+account =
+await signer.getAddress();
+
+
+document.getElementById(
+"wallet"
+).innerText=
+"Connected: "+account;
+
+
+document.getElementById(
+"connectBtn"
+).innerText=
+"✅ Connected";
+
+
+document.getElementById(
+"mintBtn"
+).disabled=false;
+
+
+setStatus(
+"✅ Wallet connected to MST Mainnet."
+);
+
+}
+
+catch(error){
+
+console.error(error);
+
+setStatus(
+"❌ Connection failed:<br>"+
+(
+error.shortMessage ||
+error.message ||
+"Unknown error"
+)
+);
+
+}
+
+}
+
+
+/* ============================
+   IMAGE PREVIEW
+============================ */
+
+function previewImage(){
+
+const file=
+document.getElementById(
+"image"
+).files[0];
+
+if(!file)return;
+
+const url=
+URL.createObjectURL(file);
+
+const img=
+document.getElementById(
+"preview"
+);
+
+img.src=url;
+
+img.style.display="block";
+
+}
+
+
+/* ============================
+   MINT
+============================ */
+
+async function mintNFT(){
+
+try{
+
+if(!signer){
+
+throw new Error(
+"Connect wallet first."
+);
+
+}
+
+
+const name=
+document.getElementById(
+"name"
+).value.trim();
+
+
+const description=
+document.getElementById(
+"description"
+).value.trim();
+
+
+const image=
+document.getElementById(
+"image"
+).files[0];
+
+
+if(!name){
+
+throw new Error(
+"NFT name enter ചെയ്യുക."
+);
+
+}
+
+
+if(!description){
+
+throw new Error(
+"NFT description enter ചെയ്യുക."
+);
+
+}
+
+
+if(!image){
+
+throw new Error(
+"NFT image select ചെയ്യുക."
+);
+
+}
+
+
+if(
+NFT_CONTRACT===
+"0xYOUR_NFT_CONTRACT_ADDRESS"
+){
+
+throw new Error(
+"NFT contract address ഇതുവരെ ചേർത്തിട്ടില്ല."
+);
+
+}
+
+
+/*
+IMPORTANT
+
+IPFS upload backend required.
+*/
+
+setStatus(
+"⏳ Image IPFS-ലേക്ക് upload ചെയ്യുന്നു..."
+);
+
+
+/*
+After IPFS backend is connected,
+imageCID ലഭിക്കും.
+*/
+
+
+const metadata={
+name:name,
+description:description
+};
+
+
+/*
+1 USDC.e = 1,000,000
+USDC decimals
+*/
+
+const fee=
+ethers.parseUnits(
+"1",
+6
+);
+
+
+/*
+USDC contract
+*/
+
+const usdc=
+new ethers.Contract(
+
+USDC,
+
+[
+"function approve(address,uint256) external returns(bool)",
+"function allowance(address,address) external view returns(uint256)"
+],
+
+signer
+
+);
+
+
+setStatus(
+"💵 1 USDC.e approval ആവശ്യമാണ്..."
+);
+
+
+const approval=
+await usdc.approve(
+NFT_CONTRACT,
+fee
+);
+
+
+await approval.wait();
+
+
+setStatus(
+"⛓️ NFT mint ചെയ്യുന്നു..."
+);
+
+
+/*
+NFT CONTRACT ABI
+
+The deployed contract must have:
+mint(string)
+*/
+
+const nft=
+new ethers.Contract(
+
+NFT_CONTRACT,
+
+[
+"function mint(string) external returns(uint256)"
+
+],
+
+signer
+
+);
+
+
+/*
+TEMP metadata URI
+
+Real app:
+IPFS metadata URI ഇവിടെ വരണം.
+*/
+
+const metadataURI=
+"ipfs://YOUR_METADATA_CID";
+
+
+const tx=
+await nft.mint(
+metadataURI
+);
+
+
+setStatus(
+"⏳ Blockchain confirmation..."
+);
+
+
+await tx.wait();
+
+
+setStatus(
+
+"🎉 <b>NFT Minted Successfully!</b><br><br>"+
+
+"<a target='_blank' href='https://mstscan.com/tx/"+
+tx.hash+
+"'>"+
+"View Transaction on MSTScan ↗"+
+"</a>"
+
+);
+
+}
+
+catch(error){
+
+console.error(error);
+
+setStatus(
+
+"❌ Mint failed:<br>"+
+(
+error.shortMessage ||
+error.reason ||
+error.message ||
+"Unknown error"
+)
+
+);
+
+}
+
+}
+
+
+/* ============================
+   WALLET EVENTS
+============================ */
+
+if(window.ethereum){
+
+window.ethereum.on(
+"accountsChanged",
+function(){
+location.reload();
+}
+);
+
+window.ethereum.on(
+"chainChanged",
+function(){
+location.reload();
+}
+);
+
+}
+
+</script>
+
+</body>
+</html>
