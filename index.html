@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AJJRA NFT</title>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+
+<style>
+*{
+ box-sizing:border-box;
+ margin:0;
+ padding:0;
+}
+
+body{
+ font-family:Arial,sans-serif;
+ background:
+ radial-gradient(circle at top,#164b38,#06100c 45%,#020403);
+ color:white;
+ min-height:100vh;
+}
+
+header{
+ height:70px;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ padding:15px 20px;
+ background:#030806ee;
+ border-bottom:1px solid #ffffff15;
+}
+
+.logo{
+ font-size:20px;
+ font-weight:800;
+}
+
+.logo span{
+ color:#43e5a2;
+}
+
+button{
+ width:100%;
+ padding:15px;
+ margin-top:10px;
+ border-radius:13px;
+ border:1px solid #43e5a255;
+ background:#10251e;
+ color:#43e5a2;
+ font-weight:bold;
+ font-size:15px;
+}
+
+.connect{
+ width:auto;
+ padding:11px 15px;
+}
+
+.mint{
+ background:linear-gradient(135deg,#43e5a2,#15996d);
+ color:#03100b;
+ border:0;
+}
+
+.hero{
+ text-align:center;
+ padding:55px 20px 30px;
+}
+
+.badge{
+ display:inline-block;
+ padding:8px 15px;
+ border-radius:30px;
+ border:1px solid #43e5a255;
+ color:#43e5a2;
+ font-size:12px;
+ margin-bottom:18px;
+}
+
+h1{
+ font-size:42px;
+ margin-bottom:15px;
+}
+
+h1 span{
+ color:#43e5a2;
+}
+
+.hero p{
+ color:#9bb0a8;
+ line-height:1.6;
+}
+
+.container{
+ width:92%;
+ max-width:650px;
+ margin:auto;
+ padding-bottom:50px;
+}
+
+.card{
+ background:#ffffff0b;
+ border:1px solid #ffffff15;
+ border-radius:22px;
+ padding:22px;
+ margin-bottom:18px;
+ box-shadow:0 20px 50px #0005;
+}
+
+.card h2{
+ margin-bottom:18px;
+}
+
+label{
+ display:block;
+ margin:15px 0 7px;
+ color:#aabdb6;
+}
+
+input,
+textarea{
+ width:100%;
+ padding:14px;
+ border-radius:12px;
+ border:1px solid #ffffff18;
+ background:#06100d;
+ color:white;
+ outline:none;
+}
+
+textarea{
+ height:110px;
+ resize:vertical;
+}
+
+input:focus,
+textarea:focus{
+ border-color:#43e5a2;
+}
+
+.wallet{
+ color:#9db1a9;
+ font-size:13px;
+ word-break:break-all;
+ line-height:1.6;
+}
+
+.fee{
+ display:flex;
+ justify-content:space-between;
+ padding:16px;
+ margin:20px 0;
+ border-radius:14px;
+ background:#43e5a20d;
+ border:1px solid #43e5a233;
+}
+
+.fee strong{
+ color:#43e5a2;
+ font-size:20px;
+}
+
+.status{
+ margin-top:15px;
+ color:#43e5a2;
+ line-height:1.6;
+ word-break:break-word;
+ white-space:pre-wrap;
+}
+
+.info{
+ color:#9db1a9;
+ line-height:1.6;
+ font-size:13px;
+}
+
+footer{
+ text-align:center;
+ padding:30px;
+ color:#63756e;
+ font-size:12px;
+}
+
+@media(max-width:500px){
+ h1{
+  font-size:34px;
+ }
+
+ .logo{
+  font-size:17px;
+ }
+
+ .connect{
+  font-size:12px;
+  padding:9px;
+ }
+}
+</style>
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="logo">
+AJJRA <span>NFT</span>
+</div>
+
+<button
+class="connect"
+onclick="connectWallet()">
+🔗 Connect Wallet
+</button>
+
+</header>
+
+
+<section class="hero">
+
+<div class="badge">
+⚡ MSTC BLOCKCHAIN
+</div>
+
+<h1>
+Create Your <span>NFT</span>
+</h1>
+
+<p>
+AJJRA NFT creation and blockchain service
+</p>
+
+</section>
+
+
+<div class="container">
+
+
+<!-- WALLET -->
+
+<div class="card">
+
+<h2>👛 Wallet</h2>
+
+<div
+id="wallet"
+class="wallet">
+Wallet not connected
+</div>
+
+</div>
+
+
+<!-- CREATE NFT -->
+
+<div class="card">
+
+<h2>🎨 Create NFT</h2>
+
+<label>NFT Name</label>
+
+<input
+id="nftName"
+type="text"
+placeholder="My First NFT"
+>
+
+
+<label>Description</label>
+
+<textarea
+id="description"
+placeholder="Describe your NFT">
+</textarea>
+
+
+<label>Metadata / IPFS URI</label>
+
+<input
+id="metadata"
+type="text"
+placeholder="ipfs://..."
+>
+
+
+<div class="fee">
+
+<span>
+AJJRA Service Fee
+</span>
+
+<strong>
+1 USDC.e
+</strong>
+
+</div>
+
+
+<button
+onclick="approveUSDC()">
+1️⃣ Approve 1 USDC.e
+</button>
+
+
+<button
+class="mint"
+onclick="mintNFT()">
+✦ MINT NFT
+</button>
+
+
+<div
+id="status"
+class="status">
+</div>
+
+</div>
+
+
+<!-- ABOUT -->
+
+<div class="card">
+
+<h2>ℹ️ AJJRA NFT</h2>
+
+<p class="info">
+
+Create a digital NFT, store its metadata
+and register the NFT on the MSTC blockchain.
+
+<br><br>
+
+Service Fee:
+<b>1 USDC.e</b>
+
+<br><br>
+
+Fee Wallet:
+
+<br>
+
+0x58A355040D211e0dB4140E98eE6619207f43e934
+
+</p>
+
+</div>
+
+
+</div>
+
+
+<footer>
+
+AJJRA NFT MINT<br>
+MSTC Blockchain
+
+</footer>
+
+
+
+<script>
+
+/*
+========================================
+AJJRA NFT APPLICATION
+========================================
+*/
+
+
+/*
+YOUR FEE WALLET
+*/
+
+const FEE_WALLET =
+"0x58A355040D211e0dB4140E98eE6619207f43e934";
+
+
+/*
+MSTC USDC.e
+
+VERIFY THIS ADDRESS ON MSTSCAN
+BEFORE USING REAL FUNDS.
+*/
+
+const USDC_ADDRESS =
+"0x349d9836dd52c25e61Ae745e3da0F8989De63745";
+
+
+/*
+IMPORTANT
+
+After deploying the NFT smart contract,
+paste its address here.
+
+Example:
+
+const NFT_CONTRACT =
+"0x1234...";
+*/
+
+const NFT_CONTRACT = "";
+
+
+let provider = null;
+let signer = null;
+let account = null;
+
+
+
+/*
+========================================
+MSTC NETWORK
+========================================
+*/
+
+const MSTC = {
+
+ chainId:"0x123e",
+
+ chainName:"MST Chain",
+
+ nativeCurrency:{
+   name:"MSTC",
+   symbol:"MSTC",
+   decimals:18
+ },
+
+ rpcUrls:[
+   "https://mariorpc.mstblockchain.com"
+ ],
+
+ blockExplorerUrls:[
+   "https://mstscan.com"
+ ]
+
+};
+
+
+
+/*
+========================================
+CONNECT WALLET
+========================================
+*/
+
+async function connectWallet(){
+
+ if(!window.ethereum){
+
+   setStatus(
+   "❌ Web3 wallet കണ്ടെത്തിയില്ല.\n\n"+
+   "MetaMask പോലുള്ള compatible wallet ഉപയോഗിക്കുക."
+   );
+
+   return;
+ }
+
+
+ try{
+
+   /*
+   Add / switch MSTC
+   */
+
+   try{
+
+     await window.ethereum.request({
+
+       method:
+       "wallet_addEthereumChain",
+
+       params:[MSTC]
+
+     });
+
+   }catch(networkError){
+
+     console.log(networkError);
+
+   }
+
+
+   provider =
+   new ethers.BrowserProvider(
+   window.ethereum
+   );
+
+
+   await provider.send(
+   "eth_requestAccounts",
+   []
+   );
+
+
+   signer =
+   await provider.getSigner();
+
+
+   account =
+   await signer.getAddress();
+
+
+   document
+   .getElementById("wallet")
+   .innerText =
+   "Connected Wallet:\n"+
+   account;
+
+
+   setStatus(
+   "✅ Wallet connected successfully."
+   );
+
+
+ }catch(error){
+
+   showError(error);
+
+ }
+
+}
+
+
+
+/*
+========================================
+APPROVE 1 USDC.e
+========================================
+*/
+
+async function approveUSDC(){
+
+ if(!signer){
+
+   setStatus(
+   "❌ ആദ്യം Connect Wallet അമർത്തുക."
+   );
+
+   return;
+
+ }
+
+
+ if(!NFT_CONTRACT){
+
+   setStatus(
+
+   "⚠️ NFT smart contract address ചേർത്തിട്ടില്ല.\n\n"+
+
+   "ആദ്യം AJJRA NFT smart contract deploy ചെയ്യണം."
+
+   );
+
+   return;
+
+ }
+
+
+ try{
+
+   const ABI = [
+
+   "function approve(address spender,uint256 amount) returns(bool)"
+
+   ];
+
+
+   const token =
+
+   new ethers.Contract(
+
+   USDC_ADDRESS,
+
+   ABI,
+
+   signer
+
+   );
+
+
+   /*
+   USDC = 6 decimals
+
+   1 USDC =
+   1,000,000
+   */
+
+   const amount =
+
+   ethers.parseUnits(
+   "1",
+   6
+   );
+
+
+   setStatus(
+   "⏳ 1 USDC.e approval confirm ചെയ്യുക..."
+   );
+
+
+   const tx =
+
+   await token.approve(
+
+   NFT_CONTRACT,
+
+   amount
+
+   );
+
+
+   setStatus(
+
+   "⏳ Approval transaction sent...\n\n"+
+   tx.hash
+
+   );
+
+
+   await tx.wait();
+
+
+   setStatus(
+
+   "✅ 1 USDC.e approved.\n\n"+
+   "ഇനി MINT NFT അമർത്തുക."
+
+   );
+
+
+ }catch(error){
+
+   showError(error);
+
+ }
+
+}
+
+
+
+/*
+========================================
+MINT NFT
+========================================
+*/
+
+async function mintNFT(){
+
+ if(!signer){
+
+   setStatus(
+   "❌ ആദ്യം Connect Wallet ചെയ്യുക."
+   );
+
+   return;
+
+ }
+
+
+ if(!NFT_CONTRACT){
+
+   setStatus(
+
+   "⚠️ NFT smart contract address ചേർത്തിട്ടില്ല.\n\n"+
+
+   "Smart contract deploy ചെയ്ത ശേഷം\n"+
+   "അതിന്റെ address ഇവിടെ ചേർക്കണം."
+
+   );
+
+   return;
+
+ }
+
+
+ const name =
+
+ document
+ .getElementById("nftName")
+ .value
+ .trim();
+
+
+ const description =
+
+ document
+ .getElementById("description")
+ .value
+ .trim();
+
+
+ const metadata =
+
+ document
+ .getElementById("metadata")
+ .value
+ .trim();
+
+
+ if(!name){
+
+   setStatus(
+   "❌ NFT Name നൽകുക."
+   );
+
+   return;
+
+ }
+
+
+ try{
+
+   const ABI = [
+
+   "function mintNFT(string memory name,string memory description,string memory metadataURI) returns(uint256)"
+
+   ];
+
+
+   const contract =
+
+   new ethers.Contract(
+
+   NFT_CONTRACT,
+
+   ABI,
+
+   signer
+
+   );
+
+
+   setStatus(
+   "⏳ Mint transaction confirm ചെയ്യുക..."
+   );
+
+
+   const tx =
+
+   await contract.mintNFT(
+
+   name,
+
+   description,
+
+   metadata
+
+   );
+
+
+   setStatus(
+
+   "⏳ Transaction submitted...\n\n"+
+   tx.hash
+
+   );
+
+
+   await tx.wait();
+
+
+   setStatus(
+
+   "✅ NFT successfully minted!\n\n"+
+   "Transaction:\n"+
+   tx.hash
+
+   );
+
+
+ }catch(error){
+
+   showError(error);
+
+ }
+
+}
+
+
+
+/*
+========================================
+STATUS
+========================================
+*/
+
+function setStatus(message){
+
+ document
+ .getElementById("status")
+ .innerText =
+ message;
+
+}
+
+
+
+/*
+========================================
+ERROR
+========================================
+*/
+
+function showError(error){
+
+ console.error(error);
+
+ const message =
+
+ error?.shortMessage ||
+ error?.reason ||
+ error?.message ||
+ "Transaction failed";
+
+
+ setStatus(
+ "❌ "+message
+ );
+
+}
+
+
+
+/*
+========================================
+WALLET ACCOUNT CHANGE
+========================================
+*/
+
+if(window.ethereum){
+
+ window.ethereum.on(
+ "accountsChanged",
+ function(accounts){
+
+   if(accounts.length){
+
+     account =
+     accounts[0];
+
+     document
+     .getElementById("wallet")
+     .innerText =
+     "Connected Wallet:\n"+
+     account;
+
+   }else{
+
+     document
+     .getElementById("wallet")
+     .innerText =
+     "Wallet not connected";
+
+   }
+
+ });
+
+}
+
+</script>
+
+</body>
+</html>
