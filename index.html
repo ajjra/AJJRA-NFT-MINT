@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width,initial-scale=1.0"
+>
+
+<title>
+AJJRA NFT MINT
+</title>
+
+
+<link
+rel="stylesheet"
+href="style.css"
+>
+
+
+<script
+src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js">
+</script>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="logo">
+
+AJJRA
+
+<span>
+NFT MINT
+</span>
+
+</div>
+
+
+<button
+id="connectBtn"
+>
+
+🔗 Connect Wallet
+
+</button>
+
+</header>
+
+
+
+<section class="hero">
+
+<div class="badge">
+
+⚡ MSTC BLOCKCHAIN
+
+</div>
+
+
+<h1>
+
+Create Your
+
+<span>
+NFT
+</span>
+
+</h1>
+
+
+<p>
+
+Create and mint your digital NFT
+on the MSTC blockchain.
+
+</p>
+
+</section>
+
+
+
+<main>
+
+
+<section class="card">
+
+<h2>
+👛 Wallet
+</h2>
+
+
+<div
+id="wallet"
+>
+
+Wallet not connected
+
+</div>
+
+</section>
+
+
+
+<section class="card">
+
+<h2>
+🎨 Create NFT
+</h2>
+
+
+<label>
+NFT Name
+</label>
+
+
+<input
+
+id="nftName"
+
+type="text"
+
+placeholder="My First NFT"
+
+>
+
+
+
+<label>
+Description
+</label>
+
+
+<textarea
+
+id="description"
+
+placeholder="Describe your NFT..."
+
+></textarea>
+
+
+
+<label>
+Metadata URI
+</label>
+
+
+<input
+
+id="metadata"
+
+type="text"
+
+placeholder="ipfs://..."
+
+>
+
+
+
+<div class="fee">
+
+<span>
+AJJRA Service Fee
+</span>
+
+
+<strong>
+1 USDC.e
+</strong>
+
+</div>
+
+
+
+<button
+
+id="approveBtn"
+
+class="secondary"
+
+>
+
+1️⃣ Approve 1 USDC.e
+
+</button>
+
+
+
+<button
+
+id="mintBtn"
+
+class="primary"
+
+>
+
+✦ MINT NFT
+
+</button>
+
+
+
+<div
+id="status"
+>
+</div>
+
+
+</section>
+
+
+
+<section class="card">
+
+<h2>
+📦 My NFTs
+</h2>
+
+
+<button
+
+id="loadBtn"
+
+class="secondary"
+
+>
+
+Load My NFTs
+
+</button>
+
+
+<div
+id="nftList"
+>
+</div>
+
+</section>
+
+
+
+<section class="card">
+
+<h2>
+🔍 Verify NFT
+</h2>
+
+
+<input
+
+id="verifyId"
+
+type="number"
+
+placeholder="NFT ID"
+
+>
+
+
+<button
+
+id="verifyBtn"
+
+class="secondary"
+
+>
+
+Verify NFT
+
+</button>
+
+
+<div
+id="verifyResult"
+>
+</div>
+
+
+</section>
+
+
+</main>
+
+
+
+<footer>
+
+AJJRA NFT MINT
+
+<br>
+
+MSTC Blockchain
+
+</footer>
+
+
+
+<script
+src="app.js"
+>
+</script>
+
+
+</body>
+
+</html>
